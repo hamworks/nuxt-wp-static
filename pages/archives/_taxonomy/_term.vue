@@ -1,16 +1,14 @@
 <template>
-  <ul>
-    <li v-for="post in posts" :key="post.id">
-      <nuxt-link :to="{ path: `/post/${post.id}` }">
-        {{ post.title.rendered }}
-      </nuxt-link>
-    </li>
-  </ul>
+  <div>
+    <h1>{{ taxonomy.name }}: {{ term.name }}</h1>
+    <Posts :posts="posts" />
+  </div>
 </template>
 
 <script>
+import Posts from '~/components/Posts'
 export default {
-  components: {},
+  components: { Posts },
   async asyncData({
     app,
     route: {
@@ -36,6 +34,8 @@ export default {
       [restBase]: currentTerm.id,
     })
     return {
+      taxonomy: currentTaxonomy,
+      term: currentTerm,
       posts,
     }
   },
