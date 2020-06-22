@@ -14,13 +14,16 @@ export default {
     route: {
       params: { taxonomy, term },
     },
+    error,
   }) {
     try {
       const taxonomies = Object.values(await app.$wp.getTaxonomies())
       const currentTaxonomy = taxonomies.find(({ slug }) => slug === taxonomy)
       const { rest_base: restBase } = currentTaxonomy
       const terms = await app.$wp.getTaxonomy(restBase)
-      const currentTerm = terms.find(({ slug }) => slug === term)
+      const currentTerm = terms.find(({ slug }) => {
+        return slug === encodeURI(term).toLowerCase()
+      })
       const posts = await app.$wp.getPosts({
         [restBase]: currentTerm.id,
       })
@@ -30,11 +33,7 @@ export default {
         posts,
       }
     } catch (e) {
-      return {
-        taxonomy: {},
-        term: {},
-        posts: [],
-      }
+      error({ statusCode: 404, message: 'ページが見つかりません' })
     }
   },
 }

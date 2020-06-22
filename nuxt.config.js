@@ -1,6 +1,48 @@
-import { getPosts, getTaxonomies, getTaxonomy, setRootURL } from './services/wp'
+import {
+  getPosts,
+  getTaxonomies,
+  getTaxonomy,
+  getPages,
+  setRootURL,
+} from './services/wp'
 
 const rootURL = 'https://ja.wordpress.org/wp-json/'
+
+const getPostRoutes = async () => {
+  const posts = await getPosts()
+  return posts.map(({ id }) => encodeURI(`archives/${id}`))
+}
+
+const getTermRoutes = async () => {
+  const taxonomies = Object.values(await getTaxonomies())
+  let termRoutes = []
+  for (const taxonomy of taxonomies) {
+    const { rest_base: restBase } = taxonomy
+    const terms = await getTaxonomy(restBase)
+    termRoutes = [
+      ...termRoutes,
+      ...terms.map((term) =>
+        encodeURI(`archives/${taxonomy.slug}/${term.slug}`)
+      ),
+    ]
+  }
+  return termRoutes
+}
+
+const getPageRoutes = async () => {
+  const pages = await getPages()
+  return pages.map(({ slug }) => encodeURI(slug))
+}
+
+const getRoutes = async () => {
+  setRootURL(rootURL)
+
+  return [
+    ...(await getPostRoutes()),
+    ...(await getTermRoutes()),
+    ...(await getPageRoutes()),
+  ]
+}
 
 export default {
   target: 'static',
@@ -27,21 +69,6 @@ export default {
     apiRootURL: rootURL,
   },
   generate: {
-    routes: async () => {
-      setRootURL(rootURL)
-      const posts = await getPosts()
-      const postRoutes = posts.map(({ id }) => `archives/${id}`)
-      const taxonomies = Object.values(await getTaxonomies())
-      let termRoutes = []
-      for (const taxonomy of taxonomies) {
-        const { rest_base: restBase } = taxonomy
-        const terms = await getTaxonomy(restBase)
-        termRoutes = [
-          ...termRoutes,
-          ...terms.map((term) => `archives/${taxonomy.slug}/${term.slug}`),
-        ]
-      }
-      return [...postRoutes, ...termRoutes]
-    },
+    routes: getRoutes,
   },
 }
