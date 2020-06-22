@@ -15,31 +15,27 @@ export default {
       params: { taxonomy, term },
     },
   }) {
-    const taxonomies = Object.values(await app.$wp.getTaxonomies())
-    const currentTaxonomy = taxonomies.find(({ slug }) => slug === taxonomy)
-    if (!currentTaxonomy) {
+    try {
+      const taxonomies = Object.values(await app.$wp.getTaxonomies())
+      const currentTaxonomy = taxonomies.find(({ slug }) => slug === taxonomy)
+      const { rest_base: restBase } = currentTaxonomy
+      const terms = await app.$wp.getTaxonomy(restBase)
+      const currentTerm = terms.find(({ slug }) => slug === term)
+      const posts = await app.$wp.getPosts({
+        [restBase]: currentTerm.id,
+      })
       return {
+        taxonomy: currentTaxonomy,
+        term: currentTerm,
+        posts,
+      }
+    } catch (e) {
+      return {
+        taxonomy: {},
+        term: {},
         posts: [],
       }
-    }
-    const { rest_base: restBase } = currentTaxonomy
-    const terms = await app.$wp.getTaxonomy(restBase)
-    const currentTerm = terms.find(({ slug }) => slug === term)
-    if (!currentTerm) {
-      return {
-        posts: [],
-      }
-    }
-    const posts = await app.$wp.getPosts({
-      [restBase]: currentTerm.id,
-    })
-    return {
-      taxonomy: currentTaxonomy,
-      term: currentTerm,
-      posts,
     }
   },
 }
 </script>
-
-<style></style>
