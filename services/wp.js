@@ -7,8 +7,15 @@ apiFetch.use(apiFetch.fetchAllInParallelMiddleware)
 const memoizedFetch = mem(apiFetch, { cacheKey: JSON.stringify })
 
 const formatPost = (post) => {
-  const { id, title, content, author, date, categories, tags } = post
-  return { id, title, content, author, date, categories, tags }
+  const {
+    _links,
+    comment_status: cs,
+    guid,
+    ping_status: ps,
+    status,
+    ...allowed
+  } = post
+  return allowed
 }
 
 export const setRootURL = (url) => {
