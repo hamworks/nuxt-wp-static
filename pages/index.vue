@@ -21,7 +21,7 @@ export default {
   components: { Posts },
   async asyncData({ app }) {
     const posts = await app.$wp.getPosts()
-    const categories = await app.$wp.getTaxonomy('categories')
+    const categories = await app.$wp.getTerms('categories')
     return {
       posts,
       categories,

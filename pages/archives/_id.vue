@@ -15,7 +15,10 @@ export default {
   }) {
     const post = await app.$wp.getPost(id)
     return {
-      post,
+      post: {
+        title: post.title,
+        content: post.content,
+      },
     }
   },
 }

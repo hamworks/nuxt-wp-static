@@ -1,7 +1,7 @@
 import {
   getPosts,
   getTaxonomies,
-  getTaxonomy,
+  getTerms,
   getPages,
   setRootURL,
 } from './services/wp'
@@ -18,7 +18,7 @@ const getTermRoutes = async () => {
   let termRoutes = []
   for (const taxonomy of taxonomies) {
     const { rest_base: restBase } = taxonomy
-    const terms = await getTaxonomy(restBase)
+    const terms = await getTerms(restBase)
     termRoutes = [
       ...termRoutes,
       ...terms.map((term) =>

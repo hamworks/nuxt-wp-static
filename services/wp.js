@@ -1,37 +1,56 @@
 import 'cross-fetch/polyfill'
 import { addQueryArgs } from '@wordpress/url'
 import apiFetch from '@hamworks/wordpress-api-fetch'
+import mem from 'mem'
 
 apiFetch.use(apiFetch.fetchAllInParallelMiddleware)
+const memoizedFetch = mem(apiFetch, { cacheKey: JSON.stringify })
+
+const formatPost = (post) => {
+  const { id, title, content, author, date, categories, tags } = post
+  return { id, title, content, author, date, categories, tags }
+}
 
 export const setRootURL = (url) => {
   apiFetch.use(apiFetch.createRootURLMiddleware(url))
 }
 
-export const getPosts = async (params) =>
-  await apiFetch({
+export const getPosts = async (params) => {
+  const posts = await memoizedFetch({
     path: addQueryArgs('/wp/v2/posts', { ...{ per_page: -1 }, ...params }),
   })
+  return posts.map(formatPost)
+}
 
-export const getPost = async (id) =>
-  await apiFetch({ path: `/wp/v2/posts/${id}` })
+export const getPost = async (id) => {
+  const post = await memoizedFetch({ path: `/wp/v2/posts/${id}` })
+  return formatPost(post)
+}
 
-export const getPages = async (params) =>
-  await apiFetch({
+export const getPages = async (params) => {
+  const pages = await memoizedFetch({
     path: addQueryArgs('/wp/v2/pages', { ...{ per_page: -1 }, ...params }),
   })
+  return pages.map(formatPost)
+}
 
-export const getPage = async (id) =>
-  await apiFetch({ path: `/wp/v2/pages/${id}` })
+export const getPage = async (id) => {
+  const page = await memoizedFetch({ path: `/wp/v2/pages/${id}` })
+  return formatPost(page)
+}
 
-export const getTaxonomies = async () =>
-  await apiFetch({
+export const getTaxonomies = async () => {
+  const taxonomies = await memoizedFetch({
     path: addQueryArgs('/wp/v2/taxonomies', {}),
   })
+  return taxonomies
+}
 
-export const getTaxonomy = async (taxonomy) =>
-  await apiFetch({
+export const getTerms = async (taxonomy) => {
+  const terms = await memoizedFetch({
     path: addQueryArgs(`/wp/v2/${taxonomy}`, {
       ...{ per_page: -1 },
     }),
   })
+  return terms
+}
