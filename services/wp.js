@@ -54,7 +54,7 @@ export const getTaxonomies = async () => {
 }
 
 export const getTerms = async (taxonomy) => {
-  const terms = await memoizedFetch({
+  const terms = await apiFetch({
     path: addQueryArgs(`/wp/v2/${taxonomy}`, {
       ...{ per_page: -1 },
     }),
