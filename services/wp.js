@@ -18,13 +18,15 @@ const formatPost = (post) => {
   return allowed
 }
 
+const parPage = 10
+
 export const setRootURL = (url) => {
   apiFetch.use(apiFetch.createRootURLMiddleware(url))
 }
 
 export const getPosts = async (params) => {
   const posts = await memoizedFetch({
-    path: addQueryArgs('/wp/v2/posts', { ...{ per_page: -1 }, ...params }),
+    path: addQueryArgs('/wp/v2/posts', { ...{ per_page: parPage }, ...params }),
   })
   return posts.map(formatPost)
 }

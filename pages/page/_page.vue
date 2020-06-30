@@ -10,9 +10,14 @@ import Posts from '~/components/Posts'
 import Categories from '~/components/Categories'
 export default {
   components: { Posts, Categories },
-  async asyncData({ app }) {
+  async asyncData({
+    app,
+    route: {
+      params: { page },
+    },
+  }) {
     const posts = await app.$wp.getPosts({
-      page: 1,
+      page,
     })
     return {
       posts,

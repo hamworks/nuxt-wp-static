@@ -10,12 +10,12 @@ export default {
   async asyncData({
     app,
     route: {
-      params: { page },
+      params: { singlePage },
     },
   }) {
     const pages = await app.$wp.getPages()
     const post = pages.find(
-      ({ slug }) => slug === encodeURI(page).toLocaleLowerCase()
+      ({ slug }) => slug === encodeURI(singlePage).toLocaleLowerCase()
     )
     return {
       post,
