@@ -8,9 +8,23 @@ import {
 
 const rootURL = 'https://ja.wordpress.org/wp-json/'
 
+const postsPerPage = 10
+
+const createPaginationRoutes = (posts, base = '') => {
+  const page = Math.floor(posts.length / postsPerPage)
+  return [...Array(page)].map((_, i) => encodeURI(`${base}/page/${i + 1}`))
+}
+
+const getIndexRoutes = async () => {
+  const posts = await getPosts({ per_page: -1 })
+  return createPaginationRoutes(posts)
+}
+
 const getPostRoutes = async () => {
-  const posts = await getPosts()
-  return posts.map(({ id }) => encodeURI(`archives/${id}`))
+  const posts = await getPosts({ per_page: -1 })
+  return posts.flatMap(({ id }) => {
+    return [encodeURI(`/archives/${id}`)]
+  })
 }
 
 const getTermRoutes = async () => {
@@ -22,7 +36,7 @@ const getTermRoutes = async () => {
     termRoutes = [
       ...termRoutes,
       ...terms.map((term) =>
-        encodeURI(`archives/${taxonomy.slug}/${term.slug}`)
+        encodeURI(`/archives/${taxonomy.slug}/${term.slug}`)
       ),
     ]
   }
@@ -38,6 +52,7 @@ const getRoutes = async () => {
   setRootURL(rootURL)
 
   return [
+    ...(await getIndexRoutes()),
     ...(await getPostRoutes()),
     ...(await getTermRoutes()),
     ...(await getPageRoutes()),
