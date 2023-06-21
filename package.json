@@ -17,7 +17,7 @@
     "@nuxtjs/pwa": "^3.0.0-beta.20",
     "cross-fetch": "^3.0.5",
     "mem": "^6.1.0",
-    "nuxt": "^2.13.0"
+    "nuxt": "^3.4.3"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^3.0.0",
